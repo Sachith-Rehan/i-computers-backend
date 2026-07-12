@@ -17,7 +17,7 @@ export async function createProduct(req,res){
     const product = await Product.findOne({productId : req.body.productId});
 
     if(product != null){
-        res.status(400).jason({message : "product with this productId already exists"});
+        res.status(400).json({message : "product with this productId already exists"});
         return;
     }
     

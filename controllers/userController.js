@@ -63,10 +63,13 @@ export async function loginUser(req , res){
                     isEmailVerified : user.isEmailVerified,
                     Image : user.Image
                 },
-                process.env.JWT_SECRET_KEY
+                process.env.JWT_SECRET_KEY,
+                {
+                    expiresIn : "24h"
+                }
             )
 
-            res.json({message : "login successful" , token : token});
+            res.json({message : "login successful" , token : token , isAdmin : user.isAdmin});
         }else{
             res.status(401).json({message : "invalid password"});
         } 
@@ -76,3 +79,4 @@ export async function loginUser(req , res){
     }        
 
 }
+

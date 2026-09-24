@@ -4,7 +4,7 @@ import express from "express";
 import mongoose from "mongoose";
 import userRouter from "./routers/userRouter.js"; 
 import productRouter from "./routers/productRouter.js";
-import jwt from "jsonwebtoken";
+import orderRouter from "./routers/orderRouter.js";
 import authenticate from "./middlewares/authenticate.js";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -36,6 +36,7 @@ app.use(authenticate);
 
 app.use("/api/users" , userRouter);
 app.use("/api/products" , productRouter);
+app.use("/api/orders", orderRouter);
 
 
 

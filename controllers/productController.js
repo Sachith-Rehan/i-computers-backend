@@ -1,6 +1,4 @@
-import Product from "../models/product.js";
-
-//create product
+import Product from "../models/product.js";//create product
 export async function createProduct(req,res){
     
     if(req.user == null){
@@ -44,7 +42,8 @@ export async function getAllProducts(req,res){
             res.json(products);
         
         }else{
-            const products = await Product.find({isAvailable : true});
+            //const products = await Product.find({isAvailable : false});
+            const products = await Product.find();
             res.json(products);
         }
 

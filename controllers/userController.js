@@ -8,9 +8,9 @@ dotenv.config();
 export async function createUser(req , res){
     
     try{
-        const user = await User.findOne({Email : req.body.Email});
+        const user = await User.findOne({email : req.body.email});
 
-        if(user != null){
+        if(user){
             res.json({message : "user already exists"});
             return;
         }
@@ -32,6 +32,46 @@ export async function createUser(req , res){
     }
         
 }
+
+// export async function createUser(req, res) {
+//     try {
+
+//         const user = await User.findOne({
+//             email: req.body.email
+//         });
+
+//         console.log("Found user:", user);
+
+//         if (user) {
+//             return res.status(400).json({
+//                 message: "user already exists"
+//             });
+//         }
+
+//         const passwordHash = bcrypt.hashSync(
+//             req.body.password,
+//             10
+//         );
+
+//         const newUser = new User({
+//             email: req.body.email,
+//             firstName: req.body.firstName,
+//             lastName: req.body.lastName,
+//             password: passwordHash
+//         });
+
+//         await newUser.save();
+
+//         res.status(201).json({
+//             message: "user created successfully"
+//         });
+
+//     } catch (error) {
+//         res.status(500).json({
+//             message: error.message
+//         });
+//     }
+// }
 
 export async function loginUser(req , res){
     try{ 

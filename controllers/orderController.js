@@ -139,3 +139,35 @@ export async function createOrder(req, res) {
         });
     }
 }
+
+
+export async function getAllOrders(req, res) {
+    if(req.user == null ){
+        res.status(401).json({message: "Unauthorized"})
+        return
+    }
+
+    try{
+        if(req.user.isAdmin){
+            const pageSizeInString = req.params.pageSize || "10"
+            const pageNumberString = req.params.pageNumber || "1"
+            const pageSize = parseInt(pageSizeInString)
+            const pageNumber = parseInt(pageNumberString)
+
+            const orderCount = await Order.countDocuments({email : req.user.email})
+            const totalPages = Math.ceil(orderCount / pageSize)
+
+            const orders = (await Order.find({email : req.user.email})).toSorted({date : -1}).skip((pageNumber-1)*pageSize).limit(pageSize)
+
+            res.json({
+                orders : orders,
+                totalPages : totalPages,
+                currentPage : pageNumber,
+                totalOrders : orderCount
+            })
+        }
+    }catch(err){
+        res.json({message : err.message})
+    }
+    
+}

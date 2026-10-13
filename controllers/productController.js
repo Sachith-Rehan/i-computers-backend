@@ -130,3 +130,21 @@ export async function getProductById(req,res){
         res.status(500).json({message : "error fetching product"});
     }
 }
+
+export async function getProductBycategory(req, res) {
+    try {
+        
+
+        const category = req.params.category;
+
+        const products = await Product.find({ category: category });
+
+        if(products.length === 0){
+            res.status(404).json({message: "no products"})
+        }else{
+            res.json(products);
+        }
+    }catch(error){
+        res.status(500).json({message : "error fetching products by category"});
+    }
+}    

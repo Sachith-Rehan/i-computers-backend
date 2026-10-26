@@ -25,6 +25,7 @@ mongoose.connect(mongoDBURI)
     });
 
 // assigning the express to a variable called app
+
 const app = express();
 
 app.use(cors());

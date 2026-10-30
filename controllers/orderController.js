@@ -188,11 +188,11 @@ export async function getAllOrders(req, res) {
     }
 
     // Check admin
-    if (!req.user.isAdmin) {
-        return res.status(403).json({
-            message: "Only admins can access all orders"
-        });
-    }
+    // if (!req.user.isAdmin) {
+    //     return res.status(403).json({
+    //         message: "Only admins can access all orders"
+    //     });
+    // }
 
     try {
 
@@ -231,6 +231,57 @@ export async function getAllOrders(req, res) {
         });
     }
 }
+
+export async function getOrdersByUser(req, res) {
+
+    // Check login
+    if (req.user == null) {
+        return res.status(401).json({
+            message: "Unauthorized"
+        });
+    }
+
+    
+    
+
+    try {
+
+        const pageSizeInString = req.params.pageSize || "10";
+        const pageNumberString = req.params.pageNumber || "1";
+
+        const pageSize = parseInt(pageSizeInString);
+        const pageNumber = parseInt(pageNumberString);
+
+        // Count ALL orders
+        const orderCount = await Order.countDocuments();
+
+        const totalPages = Math.ceil(
+            orderCount / pageSize
+        );
+
+        // Get orders
+        const orders = await Order.find({email : req.params.email})
+            .sort({ date: -1 })
+            .skip((pageNumber - 1) * pageSize)
+            .limit(pageSize);
+
+        return res.json({
+            orders: orders,
+            totalPages: totalPages,
+            currentPage: pageNumber,
+            totalOrders: orderCount
+        });
+
+    } catch (err) {
+
+        console.log(err);
+
+        return res.status(500).json({
+            message: err.message
+        });
+    }
+}
+
 
 
 export async function updateOrderStatus(req, res) {

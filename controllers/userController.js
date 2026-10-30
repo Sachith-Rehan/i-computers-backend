@@ -141,10 +141,45 @@ export async function getUser(req, res) {
             return
         }
 
-        res.json({email : user.email, firstName: user.firstName, lasrName: user.lastName, isAdmin: user.isAdmin})
+        res.json({email : user.email, firstName: user.firstName, lasrName: user.lastName, isAdmin: user.isAdmin, image: user.image, isEmailVerified: user.isEmailVerified})
          
     }catch(err){
         res.json({message : err.message})
     }
 }
 
+export async function changePassword(req, res) {
+    if(req.user == null){
+        res.status(401).json({message: "unaythorized"})
+        return
+    }
+
+    const password = req.body.password
+    const passwordHash = bcrypt.hashSync(password, 10)
+
+    try{
+        const email = req.user.email
+        await User.updateOne({email : email}, {password : passwordHash})
+    }catch(err){
+        res.json({message : err.message})
+    }
+}
+
+
+export async function updateProfile() {
+    if(req.user == null){
+        res.status(401).json({message: "unaythorized"})
+        return
+    }
+    
+    try{
+        const email = req.user.email
+
+        const user = User.updateOne({email: email}, {firstName: req.body.firstName, lastname: req.body.lastName, image: req.body.image})
+
+        res.json({message: "Profile updated succssfully"})
+        return
+    }catch(err){
+        console.log({message: err.message})
+    }   
+}

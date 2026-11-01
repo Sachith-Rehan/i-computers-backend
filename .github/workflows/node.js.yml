@@ -40,3 +40,4 @@ jobs:
       
           echo "Current directory: $(pwd)"
           ls -l .env
+      - run: pm2 restat index

@@ -35,5 +35,8 @@ jobs:
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
         run: |
           umask 077
-          printf 'MONGO_URI=%s\nJWT_SECRET_KEY=%s\n' \
-            "$MONGO_URI" "$JWT_SECRET_KEY" > .env
+          echo "MONGO_URI=$MONGO_URI" > .env
+          echo "JWT_SECRET_KEY=$JWT_SECRET_KEY" >> .env
+      
+          echo "Current directory: $(pwd)"
+          ls -l .env

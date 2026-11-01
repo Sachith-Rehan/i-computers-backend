@@ -1,10 +1,14 @@
 import express from "express";
-import { createUser, getUser } from "../controllers/userController.js";
+import { changePassword, createUser, getUser, googleLogin, updateProfile } from "../controllers/userController.js";
 import { loginUser } from "../controllers/userController.js";
+
 
 const userRouter = express.Router();
 
 userRouter.post("/create" , createUser);
 userRouter.post("/login" , loginUser);
-userRouter.get("/me" , getUser)
+userRouter.get("/me" , getUser);
+userRouter.post("/change", changePassword);
+userRouter.post("/update", updateProfile)
+userRouter.post("/google-login", googleLogin);
 export default userRouter;

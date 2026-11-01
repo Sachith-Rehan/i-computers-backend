@@ -2,6 +2,7 @@ import User from "../models/user.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import axios from "axios";
 dotenv.config();
 
 
@@ -154,7 +155,7 @@ export async function changePassword(req, res) {
         return
     }
 
-    const password = req.body.password
+    const password = req.body.newPassword
     const passwordHash = bcrypt.hashSync(password, 10)
 
     try{
@@ -166,7 +167,7 @@ export async function changePassword(req, res) {
 }
 
 
-export async function updateProfile() {
+export async function updateProfile(req, res) {
     if(req.user == null){
         res.status(401).json({message: "unaythorized"})
         return
@@ -175,11 +176,91 @@ export async function updateProfile() {
     try{
         const email = req.user.email
 
-        const user = User.updateOne({email: email}, {firstName: req.body.firstName, lastname: req.body.lastName, image: req.body.image})
+        User.updateOne({email: email}, {firstName: req.body.firstName, lastname: req.body.lastName, image: req.body.image})
 
         res.json({message: "Profile updated succssfully"})
         return
     }catch(err){
         console.log({message: err.message})
     }   
+}
+
+
+
+
+
+
+export async function googleLogin(req, res) {
+    const accessToken = req.body.accessToken;
+
+    //console.log(accessToken)
+    const response = await axios.get("https://www.googleapis.com/oauth2/v3/userinfo", {
+        headers: {
+            Authorization: `Bearer ${accessToken}`
+        }  
+    })
+
+    const user = await User.findOne({email : response.data.email})
+
+    if(user == null){
+
+        const randomPassword = Math.random().toString(36).slice(-8)
+
+        const passwordHash = bcrypt.hashSync(randomPassword, 10)
+        const newUser = new User({
+            email: response.data.email,
+            firstName: response.data.given_name,
+            lastName: response.data.family_name,
+            password: passwordHash,
+            isEmailVerified: true,
+            image: response.data.picture
+        })
+
+        await newUser.save()
+
+        const token = jwt.sign({
+            email : newUser.email,
+            firstName : newUser.firstName,
+            lastName : newUser.lastName,
+            password : newUser.password,
+            isAdmin : newUser.isAdmin,
+            isBlocked : newUser.isBlocked,
+            isEmailVerified : newUser.isEmailVerified,
+            image : newUser.image
+            },
+                process.env.JWT_SECRET_KEY
+            ,
+            {
+                expiresIn : "24h"
+            }
+        )
+        res.json({ message: "Login successfull", token: token , isAdmin: newUser.isAdmin})
+
+        return
+    
+    }else{
+        const token = jwt.sign({
+            email : user.email,
+            firstName : user.firstName,
+            lastName : user.lastName,
+            password : user.password,
+            isAdmin : user.isAdmin,
+            isBlocked : user.isBlocked,
+            isEmailVerified : user.isEmailVerified,
+            image : user.image
+        },
+            process.env.JWT_SECRET_KEY
+        ,
+            {
+                expiresIn: "24h"
+            }
+        )
+
+        res.json({ message: "Login successfull", token: token , isAdmin: user.isAdmin})
+
+        console.log(user)
+
+        return
+
+    }
 }
